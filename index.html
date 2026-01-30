@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motorcycle Runner - Embed Demo</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .info-box {
+            background: #fff;
+            border: 2px solid #333;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box h2 {
+            margin-top: 0;
+            color: #cc0000;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        
+        .button {
+            background: lightgreen;
+            color: black;
+            border: 2px solid black;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        .button:hover {
+            background: yellow;
+        }
+        
+        .controls {
+            background: #ffffcc;
+            border-left: 4px solid #ff0000;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .controls strong {
+            color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏍️ Motorcycle Runner - Embeddable Game Demo</h1>
+    
+    <div class="info-box">
+        <h2>What is this?</h2>
+        <p>This page demonstrates how to embed the Motorcycle Runner game into any website with just one line of code.</p>
+    </div>
+    
+    <div class="controls">
+        <strong>🎮 How to Play:</strong>
+        <ul>
+            <li>Press <strong>SPACEBAR</strong> anywhere on this page to show the game</li>
+            <li>Press <strong>SPACEBAR</strong> again to start playing</li>
+            <li>Press <strong>ESC</strong> to close the game and return to this page</li>
+            <li>Or click the <strong>✕ Close</strong> button in the game</li>
+        </ul>
+    </div>
+    
+    <button class="button" onclick="MotorcycleRunner.show()">
+        Launch Game (or press SPACEBAR)
+    </button>
+    
+    <div class="info-box">
+        <h2>📝 How to Embed</h2>
+        <p>Add this single line to your HTML page:</p>
+        <div class="code-block">
+&lt;script src="https://kurtzeborn.net/game/game-embed.js"&gt;&lt;/script&gt;
+        </div>
+        
+        <p>That's it! The game will automatically load and users can press SPACEBAR to play.</p>
+    </div>
+    
+    <div class="info-box">
+        <h2>🎯 Features</h2>
+        <ul>
+            <li>✅ Single file embed (no dependencies)</li>
+            <li>✅ Works on any website</li>
+            <li>✅ Mobile and desktop support</li>
+            <li>✅ Full-screen overlay mode</li>
+            <li>✅ Isolated from page styles</li>
+            <li>✅ ~65KB total size</li>
+        </ul>
+    </div>
+    
+    <div class="info-box">
+        <h2>🔧 API (Optional)</h2>
+        <p>You can also control the game programmatically:</p>
+        <div class="code-block">
+// Show the game overlay<br>
+MotorcycleRunner.show();<br>
+<br>
+// Hide the game overlay<br>
+MotorcycleRunner.hide();<br>
+<br>
+// Check version<br>
+console.log(MotorcycleRunner.version);
+        </div>
+    </div>
+    
+    <div class="info-box">
+        <h2>🎮 Game Controls</h2>
+        <p><strong>Desktop:</strong></p>
+        <ul>
+            <li>SPACE or ↑ - Jump</li>
+            <li>↓ - Duck</li>
+        </ul>
+        <p><strong>Mobile:</strong></p>
+        <ul>
+            <li>Tap top half of screen - Jump</li>
+            <li>Hold bottom half of screen - Duck</li>
+        </ul>
+    </div>
+    
+    <hr style="margin: 40px 0;">
+    
+    <p style="text-align: center; color: #666;">
+        <strong>Now try it!</strong> Press SPACEBAR anywhere on this page to launch the game.
+    </p>
+    
+    <!-- THE MAGIC LINE -->
+    <script src="game-embed.js"></script>
+</body>
+</html>

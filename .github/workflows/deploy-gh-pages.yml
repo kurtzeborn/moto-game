@@ -1,0 +1,52 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'game/**'
+      - 'scott.kurtzeborn.com/**'
+      - 'kurtzeborn.com/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+      - name: Switch to gh-pages branch
+        run: git checkout gh-pages
+        
+      - name: Update from main
+        run: |
+          git checkout main -- game scott.kurtzeborn.com kurtzeborn.com
+          
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet HEAD; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git add game scott.kurtzeborn.com kurtzeborn.com
+          git commit -m "Auto-deploy from master (commit ${{ github.sha }})"
+          git push origin gh-pages
