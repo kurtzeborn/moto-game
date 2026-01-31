@@ -1,7 +1,7 @@
 /**
  * Motorcycle Runner - Embeddable Game
  * 
- * Usage: <script src="https://kurtzeborn.net/game/game-embed.js"></script>
+ * Usage: <script src="https://moto.k61.dev/game-embed.js"></script>
  * 
  * Controls:
  * - Press SPACEBAR to toggle game overlay

@@ -23,7 +23,7 @@ Chrome T-Rex inspired endless runner game with motorcycle theme.
 Add to any website with one line:
 
 ```html
-<script src="https://kurtzeborn.net/game/game-embed.js"></script>
+<script src="https://moto.k61.dev/game-embed.js"></script>
 ```
 
 Press SPACEBAR to launch game overlay. See [EMBED.md](EMBED.md) for details.

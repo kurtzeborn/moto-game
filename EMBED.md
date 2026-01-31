@@ -5,7 +5,7 @@
 Add this single line to your HTML:
 
 ```html
-<script src="https://kurtzeborn.net/game/game-embed.js"></script>
+<script src="https://moto.k61.dev/game-embed.js"></script>
 ```
 
 That's it! Users can press **SPACEBAR** to launch the game overlay.
