@@ -1,6 +1,6 @@
 # Motorcycle Runner
 
-![deploy](https://img.shields.io/github/actions/workflow/status/kurtzeborn/moto-game/azure-static-web-apps-lemon-bay-02909bc10.yml?label=deploy)
+[![deploy](https://img.shields.io/github/actions/workflow/status/kurtzeborn/moto-game/azure-static-web-apps-lemon-bay-02909bc10.yml?label=deploy)](https://github.com/kurtzeborn/moto-game/actions/workflows/azure-static-web-apps-lemon-bay-02909bc10.yml)
 
 Chrome T-Rex inspired endless runner game with motorcycle theme.
 
