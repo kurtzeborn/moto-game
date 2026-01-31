@@ -1,10 +1,12 @@
 // Motorcycle Runner Game - Chrome T-Rex Style
 // CODE REVIEW: Always increment version number before making changes
 
-const VERSION = 'v0.23';
+const VERSION = 'v0.35';
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+// Disable image smoothing for crisp pixel art
+ctx.imageSmoothingEnabled = false;
 const gameOverlay = document.getElementById('gameOverlay');
 const finalScoreEl = document.getElementById('finalScore');
 const dailyHighScoreEl = document.getElementById('dailyHighScore');
@@ -52,6 +54,7 @@ const CONFIG = {
     
     // === VISUAL EFFECTS ===
     SPRITE_SCALE: 3,
+    VEHICLE_SPRITE_SCALE: 4, // Larger than SPRITE_SCALE for better visibility (must be integer to avoid pixel gaps)
     PARTICLE_SPAWN_INTERVAL: 5,
     COLLISION_FLASH_DURATION: 10,
     BONUS_MESSAGE_DURATION: 300, // 5 seconds at 60fps
@@ -79,6 +82,13 @@ const CONFIG = {
     STAR_MIN_OPACITY: 0.5,
     STAR_MAX_OPACITY: 1.0,
     
+    // === SPEEDOMETER ===
+    SPEEDOMETER_RADIUS: 40,
+    SPEEDOMETER_MARGIN: 15,
+    SPEEDOMETER_MIN_SPEED: 6,   // Matches INITIAL_SPEED
+    SPEEDOMETER_MAX_SPEED: 20,  // Max speed for full needle deflection
+    SPEEDOMETER_REDLINE_START: 0.7, // Redline starts at 70% of arc
+    
     // === DEBUG ===
     DEBUG_MODE: false // Set to true to see hitboxes
 };
@@ -104,6 +114,8 @@ function getCachedSprite(sprite, scale = CONFIG.SPRITE_SCALE, flipH = false, pal
         offscreenCanvas.width = width;
         offscreenCanvas.height = height;
         const offscreenCtx = offscreenCanvas.getContext('2d');
+        // Disable image smoothing for crisp pixel art
+        offscreenCtx.imageSmoothingEnabled = false;
         
         // Apply horizontal flip if needed
         if (flipH) {
@@ -228,13 +240,15 @@ const motorcycle = {
 // Obstacles array
 let obstacles = [];
 // Define obstacle types - dimensions are calculated from sprites automatically
+// Uses VEHICLE_SPRITE_SCALE for 50% larger vehicles
 function getObstacleTypes() {
+    const scale = CONFIG.VEHICLE_SPRITE_SCALE;
     return [
-        { sprite: 'CAR', ...getSpriteDimensions(SPRITES.CAR), type: 'vehicle', rideable: false },
-        { sprite: 'TRUCK', ...getSpriteDimensions(SPRITES.TRUCK), type: 'vehicle', rideable: false },
-        { sprite: 'VAN', ...getSpriteDimensions(SPRITES.VAN), type: 'vehicle', rideable: false },
-        { sprite: 'BUS', ...getSpriteDimensions(SPRITES.BUS), type: 'vehicle', rideable: true },
-        { sprite: 'SEMI_TRUCK', ...getSpriteDimensions(SPRITES.SEMI_TRUCK), type: 'vehicle', rideable: true }
+        { sprite: 'CAR', ...getSpriteDimensions(SPRITES.CAR, scale), type: 'vehicle', rideable: false },
+        { sprite: 'TRUCK', ...getSpriteDimensions(SPRITES.TRUCK, scale), type: 'vehicle', rideable: false },
+        { sprite: 'VAN', ...getSpriteDimensions(SPRITES.VAN, scale), type: 'vehicle', rideable: false },
+        { sprite: 'BUS', ...getSpriteDimensions(SPRITES.BUS, scale), type: 'vehicle', rideable: true },
+        { sprite: 'SEMI_TRUCK', ...getSpriteDimensions(SPRITES.SEMI_TRUCK, scale), type: 'vehicle', rideable: true }
     ];
 }
 const obstacleTypes = getObstacleTypes();
@@ -998,11 +1012,11 @@ function drawMotorcycle() {
 }
 
 function drawObstacles() {
-    // Draw ground obstacles (vehicle sprites)
+    // Draw ground obstacles (vehicle sprites) - use VEHICLE_SPRITE_SCALE for larger vehicles
     obstacles.forEach(obstacle => {
         const sprite = SPRITES[obstacle.sprite];
         if (sprite) {
-            drawSprite(sprite, obstacle.x, obstacle.y, CONFIG.SPRITE_SCALE, obstacle.flipH, obstacle.palette);
+            drawSprite(sprite, obstacle.x, obstacle.y, CONFIG.VEHICLE_SPRITE_SCALE, obstacle.flipH, obstacle.palette);
         }
     });
     
@@ -1230,6 +1244,69 @@ function drawVersion() {
     ctx.fillText(VERSION, canvas.width - 10, canvas.height - 10);
 }
 
+function drawSpeedometer() {
+    const radius = CONFIG.SPEEDOMETER_RADIUS;
+    const margin = CONFIG.SPEEDOMETER_MARGIN;
+    const centerX = radius + margin; // Bottom left
+    const centerY = canvas.height - margin; // Center at very bottom
+    
+    // Arc spans from 220 degrees (bottom-left) to 320 degrees (bottom-right)
+    const startAngle = (220 * Math.PI) / 180;
+    const endAngle = (320 * Math.PI) / 180;
+    const totalArc = endAngle - startAngle;
+    
+    // Calculate redline start angle
+    const redlineAngle = startAngle + totalArc * CONFIG.SPEEDOMETER_REDLINE_START;
+    
+    // Draw speedometer background arc (gray area)
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, startAngle, redlineAngle);
+    ctx.lineTo(centerX, centerY);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(100, 100, 100, 0.6)';
+    ctx.fill();
+    
+    // Draw redline area
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, redlineAngle, endAngle);
+    ctx.lineTo(centerX, centerY);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(200, 50, 50, 0.7)';
+    ctx.fill();
+    
+    // Draw border arc
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+    ctx.strokeStyle = interpolateColor('#333333', '#cccccc', skyTransition);
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Calculate needle angle based on game speed
+    // Start at 10% and scale to 100% of the arc
+    const speedRange = CONFIG.SPEEDOMETER_MAX_SPEED - CONFIG.SPEEDOMETER_MIN_SPEED;
+    const speedPercent = Math.min(1, (gameSpeed - CONFIG.SPEEDOMETER_MIN_SPEED) / speedRange);
+    const adjustedPercent = 0.1 + speedPercent * 0.9; // Start at 10%, max at 100%
+    const needleAngle = startAngle + totalArc * adjustedPercent;
+    
+    // Draw needle (white)
+    const needleLength = radius - 8;
+    const needleX = centerX + Math.cos(needleAngle) * needleLength;
+    const needleY = centerY + Math.sin(needleAngle) * needleLength;
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(needleX, needleY);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Draw center hub
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = interpolateColor('#333333', '#cccccc', skyTransition);
+    ctx.fill();
+}
+
 function drawDebugHitboxes() {
     if (!CONFIG.DEBUG_MODE) return;
     
@@ -1291,6 +1368,7 @@ function draw() {
     bonusMessages.forEach(m => m.draw());
     
     drawScore();
+    drawSpeedometer();
     drawVersion();
     drawDebugHitboxes();
 }

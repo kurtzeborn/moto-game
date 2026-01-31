@@ -56,6 +56,9 @@
                     max-width: 100vw;
                     max-height: 100vh;
                     touch-action: none;
+                    /* Prevent sub-pixel rendering gaps when CSS-scaled */
+                    image-rendering: pixelated;
+                    image-rendering: crisp-edges;
                 }
                 
                 .motorcycle-game-overlay {
